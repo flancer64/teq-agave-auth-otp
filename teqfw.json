@@ -4,5 +4,13 @@
       "ns": "Fl64_Auth_Otp_",
       "path": "./src"
     }
+  },
+  "@teqfw/web": {
+    "handlers": {
+      "Fl64_Auth_Otp_Back_Web_Handler": {
+        "before": ["TeqFw_Web_Api_Back_Web_Handler_Service"],
+        "spaces": ["fl64-auth-otp"]
+      }
+    }
   }
 }

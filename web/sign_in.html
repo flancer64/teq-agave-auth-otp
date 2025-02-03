@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Registration</title>
+    <style>
+        :root {
+            --primary-color: #005f3f;
+            --background-color: #f4e1c1;
+            --text-color: #333;
+            --input-bg: white;
+            --button-radius: 4px;
+            --error-color: #dc3545;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #222;
+                --text-color: #ddd;
+                --input-bg: #333;
+            }
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 360px;
+            margin: auto;
+            background: var(--input-bg);
+            padding: 20px;
+            border-radius: var(--button-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: var(--button-radius);
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--button-radius);
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #004d30;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Email Registration</h2>
+    <form id="email-form" method="POST" action="/app/otp/email">
+        <input type="email" name="email" id="email" placeholder="Enter your email" required>
+        <input type="hidden" name="xsrf_token" id="xsrf_token" value="">
+        <p class="error" id="error-msg">Invalid email format</p>
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById("xsrf_token").value = getCookie("XSRF-TOKEN");
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : "";
+    }
+</script>
+</body>
+</html>
