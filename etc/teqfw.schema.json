@@ -1,0 +1,65 @@
+{
+  "package": {
+    "fl64": {
+      "package": {
+        "auth": {
+          "package": {
+            "otp": {
+              "entity": {
+                "email": {
+                  "comment": "Stores a unique email for each user to enable OTP authentication, tracking its verification status.",
+                  "attr": {
+                    "user_ref": {
+                      "type": "ref",
+                      "comment": "Reference to the user entity."
+                    },
+                    "email": {
+                      "type": "string",
+                      "comment": "Email address used for OTP authentication. Must be unique."
+                    },
+                    "status": {
+                      "type": "enum",
+                      "comment": "Current verification status of the email.",
+                      "options": {
+                        "values": ["UNVERIFIED", "VERIFIED", "INACTIVE"]
+                      },
+                      "default": "UNVERIFIED"
+                    },
+                    "date_created": {
+                      "type": "datetime",
+                      "comment": "Timestamp when the email record was created.",
+                      "default": "current"
+                    },
+                    "date_verified": {
+                      "type": "datetime",
+                      "comment": "Timestamp when the email was verified. Null if not verified.",
+                      "nullable": true
+                    }
+                  },
+                  "index": {
+                    "pk": {
+                      "type": "primary", "attrs": ["user_ref"]
+                    },
+                    "email": {
+                      "type": "unique", "attrs": ["email"]
+                    }
+                  },
+                  "relation": {
+                    "user": {
+                      "attrs": ["user_ref"],
+                      "ref": {"path": "/user", "attrs": ["id"]},
+                      "action": {"delete": "cascade", "update": "cascade"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "refs": {
+    "/user": ["id"]
+  }
+}

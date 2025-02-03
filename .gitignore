@@ -1,0 +1,15 @@
+!/var/.gitkeep
+/**/node_modules/
+/**/own_modules/
+/**/package-lock.json
+/**/tmp/
+/.env
+/.idea/
+/.nyc_output/
+/.vscode/
+/atlassian-ide-plugin.xml
+/cfg/local.*
+/coverage/
+/instrumented/
+/test/data/*.sqlite3*
+/var/*

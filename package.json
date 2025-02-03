@@ -1,0 +1,33 @@
+{
+  "name": "@flancer64/teq-agave-auth-otp",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "TeqFW plugin for email OTP authentication, providing secure, passwordless login with one-time codes.",
+  "homepage": "https://github.com/flancer64/teq-agave-auth-otp/",
+  "bugs": {
+    "url": "https://github.com/flancer64/teq-agave-auth-otp/issues",
+    "email": "alex@flancer64.com"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Alex Gusev",
+    "email": "alex@flancer64.com",
+    "url": "https://github.com/flancer64"
+  },
+  "repository": "github:flancer64/teq-agave-auth-otp",
+  "scripts": {
+    "test:accept": "mocha ./test/accept --recursive",
+    "test:unit": "mocha ./test/unit --recursive"
+  },
+  "dependencies": {
+    "@flancer64/teq-agave-otp": "git+ssh://git@github.com:flancer64/teq-agave-otp.git",
+    "@flancer64/teq-agave-web-session": "git+ssh://git@github.com:flancer64/teq-agave-web-session.git",
+    "@teqfw/db": ">=0.22.1 <1.0.0"
+  },
+  "devDependencies": {
+    "@teqfw/test": ">=0.20.1 <1.0.0",
+    "better-sqlite3": "latest",
+    "dotenv": "latest",
+    "mocha": "latest"
+  }
+}
