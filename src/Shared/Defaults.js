@@ -3,7 +3,7 @@
  */
 export default class Fl64_Auth_Otp_Shared_Defaults {
 
-    NAME = '@flancer64/teq-agave-otp';
+    NAME = '@flancer64/teq-agave-auth-otp';
 
     ROUTE_AUTH = 'auth/?otp=:otp';
     ROUTE_LOGIN = 'login';
