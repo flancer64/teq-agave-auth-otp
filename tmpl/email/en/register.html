@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmation</title>
+    <style>
+        :root {
+            --primary-color: #005f3f;
+            --background-color: #f4e1c1;
+            --text-color: #333;
+            --container-bg: white;
+            --button-radius: 4px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #222;
+                --text-color: #ddd;
+                --container-bg: #333;
+            }
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 360px;
+            margin: auto;
+            background: var(--container-bg);
+            padding: 20px;
+            border-radius: var(--button-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            display: inline-block;
+            background: #004d30;
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--button-radius);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: #008f5a;
+        }
+
+        .note {
+            font-size: 14px;
+            margin-top: 10px;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Email Confirmation</h2>
+    <p>Thank you for registering with our service. To complete your registration and activate your account, please
+        confirm your email address by clicking the button below:</p>
+    <p><a href="{{verifyLink}}" class="button">Confirm Email</a></p>
+    <p class="note">If the button above does not work, copy and paste the following link into your browser:</p>
+    <p><a href="{{verifyLink}}" style="word-break: break-all;">{{verifyLink}}</a></p>
+    <p class="note"><strong>Note:</strong> This confirmation link is valid for 24 hours.</p>
+    <p class="note">If you did not request this registration, please ignore this email.</p>
+</div>
+</body>
+</html>

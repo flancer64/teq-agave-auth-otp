@@ -5,6 +5,12 @@
       "path": "./src"
     }
   },
+  "@teqfw/core": {
+    "plugin": {
+      "onInit": "Fl64_Auth_Otp_Back_Plugin_Start",
+      "onStop": "Fl64_Auth_Otp_Back_Plugin_Stop"
+    }
+  },
   "@teqfw/web": {
     "handlers": {
       "Fl64_Auth_Otp_Back_Web_Handler": {

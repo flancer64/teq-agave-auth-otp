@@ -1,0 +1,6 @@
+{
+  "subject": "Confirm Your Email Address",
+  "variables": [
+    "verifyLink"
+  ]
+}

@@ -19,6 +19,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler {
      * @param {TeqFw_Core_Shared_Api_Logger} logger
      * @param {TeqFw_Web_Back_App_Server_Respond} respond
      * @param {Fl64_Auth_Otp_Back_Web_Handler_A_Register} aRegister
+     * @param {Fl64_Auth_Otp_Back_Web_Handler_A_Verify} aVerify
      */
     constructor(
         {
@@ -26,6 +27,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler {
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_App_Server_Respond$: respond,
             Fl64_Auth_Otp_Back_Web_Handler_A_Register$: aRegister,
+            Fl64_Auth_Otp_Back_Web_Handler_A_Verify$: aVerify,
         }
     ) {
         /**
@@ -45,11 +47,11 @@ export default class Fl64_Auth_Otp_Back_Web_Handler {
                     case DEF.SHARED.ROUTE_AUTH:
                         //await aProviderSelect.act(req, res);
                         break;
-                    case DEF.SHARED.ROUTE_LOGIN:
-                        //await aCallback.act(req, res);
-                        break;
                     case DEF.SHARED.ROUTE_REGISTER:
                         await aRegister.run(req, res);
+                        break;
+                    case DEF.SHARED.ROUTE_VERIFY:
+                        await aVerify.run(req, res);
                         break;
                     default:
                         // If the endpoint is not recognized, do nothing and let other handlers process it

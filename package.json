@@ -23,7 +23,8 @@
     "@flancer64/teq-agave-otp": "git+ssh://git@github.com:flancer64/teq-agave-otp.git",
     "@flancer64/teq-agave-tmpl": "git+ssh://git@github.com:flancer64/teq-agave-tmpl.git",
     "@flancer64/teq-agave-web-session": "git+ssh://git@github.com:flancer64/teq-agave-web-session.git",
-    "@teqfw/db": ">=0.22.1 <1.0.0"
+    "@teqfw/db": ">=0.22.1 <1.0.0",
+    "@teqfw/web": ">=0.26.0 <1.0.0"
   },
   "devDependencies": {
     "@teqfw/test": ">=0.20.1 <1.0.0",

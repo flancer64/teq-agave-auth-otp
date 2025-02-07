@@ -73,23 +73,30 @@
 <body>
 <div class="container">
     <h2>Email Registration</h2>
-    <form id="email-form" method="POST" action="/app/otp/email">
+    <form id="email-form">
         <input type="email" name="email" id="email" placeholder="Enter your email" required>
-        <input type="hidden" name="xsrf_token" id="xsrf_token" value="">
-        <p class="error" id="error-msg">Invalid email format</p>
+        <input type="hidden" name="xsrf_token" id="xsrf_token" value="{{xsrfToken}}">
+
+        <p id="success-msg" style="display: none; color: green;">Registration successful! A verification link has been sent to your email.</p>
+
+        <p id="error-EMAIL_EXISTS" class="error-message" style="display: none; color: red;">This email is already registered.</p>
+        <p id="error-EMAIL_NOT_ALLOWED" class="error-message" style="display: none; color: red;">This email is not allowed.</p>
+        <p id="error-EMAIL_NOT_SENT" class="error-message" style="display: none; color: red;">Failed to send verification email.</p>
+        <p id="error-WRONG_XSRF" class="error-message" style="display: none; color: red;">Invalid security token. Please reload the page.</p>
+        <p id="error-UNDEFINED" class="error-message" style="display: none; color: red;">Unexpected server error. Please try again later.</p>
+
+        <div id="loading" style="display: none;">Processing...</div>
+
         <button type="submit">Register</button>
     </form>
 </div>
 
-<script>
-    document.getElementById("xsrf_token").value = getCookie("XSRF-TOKEN");
+<script type="module">
+    /** @type {TeqFw_Di_Container} */
+    import container from '/web/@flancer64/teq-agave-auth-otp/js/di.js';
 
-    function getCookie(name) {
-        let matches = document.cookie.match(new RegExp(
-            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-        ));
-        return matches ? decodeURIComponent(matches[1]) : "";
-    }
+    /** @type {Fl64_Auth_Otp_Front_Ui_Page_Register} */
+    const page = await container.get('Fl64_Auth_Otp_Front_Ui_Page_Register$');
 </script>
 </body>
 </html>
