@@ -15,7 +15,7 @@ export default class Fl64_Auth_Otp_Back_Store_Mem_XsrfToken {
         // VARS
         const store = new Map();
         let maxSize = 1000;
-        let defaultLifetime = 600000;
+        let defaultLifetime = 600000; // 10 min
 
         // MAIN
         /**
@@ -118,7 +118,10 @@ export default class Fl64_Auth_Otp_Back_Store_Mem_XsrfToken {
             // If storage is full, remove the oldest entry
             if (store.size >= maxSize) {
                 const oldestKey = store.keys().next().value;
-                if (oldestKey) store.delete(oldestKey);
+                if (oldestKey) {
+                    store.delete(oldestKey);
+                    logger.info(`If storage is full, the oldest entry is removed (${oldestKey}).`);
+                }
             }
 
             store.set(key, {expiresAt: finalExpiresAt});

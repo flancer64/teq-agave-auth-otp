@@ -18,6 +18,8 @@ export default class Fl64_Auth_Otp_Back_Web_Handler {
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF
      * @param {TeqFw_Core_Shared_Api_Logger} logger
      * @param {TeqFw_Web_Back_App_Server_Respond} respond
+     * @param {Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate} aAuthenticate
+     * @param {Fl64_Auth_Otp_Back_Web_Handler_A_Login} aLogin
      * @param {Fl64_Auth_Otp_Back_Web_Handler_A_Register} aRegister
      * @param {Fl64_Auth_Otp_Back_Web_Handler_A_Verify} aVerify
      */
@@ -26,6 +28,8 @@ export default class Fl64_Auth_Otp_Back_Web_Handler {
             Fl64_Auth_Otp_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_App_Server_Respond$: respond,
+            Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate$: aAuthenticate,
+            Fl64_Auth_Otp_Back_Web_Handler_A_Login$: aLogin,
             Fl64_Auth_Otp_Back_Web_Handler_A_Register$: aRegister,
             Fl64_Auth_Otp_Back_Web_Handler_A_Verify$: aVerify,
         }
@@ -45,7 +49,10 @@ export default class Fl64_Auth_Otp_Back_Web_Handler {
 
                 switch (endpoint) {
                     case DEF.SHARED.ROUTE_AUTH:
-                        //await aProviderSelect.act(req, res);
+                        await aAuthenticate.run(req, res);
+                        break;
+                    case DEF.SHARED.ROUTE_LOGIN:
+                        await aLogin.run(req, res);
                         break;
                     case DEF.SHARED.ROUTE_REGISTER:
                         await aRegister.run(req, res);

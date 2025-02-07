@@ -7,9 +7,9 @@ const {
 } = H2;
 
 /**
- * Handler for processing user email registration requests.
+ * Handler for processing user login requests.
  */
-export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
+export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
     /**
      * Initializes the registration handler.
      *
@@ -21,29 +21,27 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
      * @param {Fl64_Auth_Otp_Back_Store_Mem_XsrfToken} memXsrfToken
      * @param {Fl64_Auth_Otp_Back_Web_Helper} helper
      * @param {Fl64_Auth_Otp_Back_Api_Adapter} adapter
-     * @param {Fl64_Auth_Otp_Back_Email_Register} servEmail
+     * @param {Fl64_Auth_Otp_Back_Email_Login} servEmail
      * @param {Fl64_Auth_Otp_Back_Store_RDb_Repo_Email} repoEmail
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Status} STATUS
-     * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Register} RESULT
+     * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Login} RESULT
      * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL_TYPE
      */
-    constructor(
-        {
-            Fl64_Auth_Otp_Back_Defaults$: DEF,
-            TeqFw_Core_Shared_Api_Logger$$: logger,
-            TeqFw_Web_Back_App_Server_Respond$: respond,
-            TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
-            Fl64_Tmpl_Back_Service_Render$: tmplRender,
-            Fl64_Auth_Otp_Back_Store_Mem_XsrfToken$: memXsrfToken,
-            Fl64_Auth_Otp_Back_Web_Helper$: helper,
-            Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
-            Fl64_Auth_Otp_Back_Email_Register$: servEmail,
-            Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
-            'Fl64_Auth_Otp_Shared_Enum_Status.default': STATUS,
-            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Register.default': RESULT,
-            'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
-        }
-    ) {
+    constructor({
+                    Fl64_Auth_Otp_Back_Defaults$: DEF,
+                    TeqFw_Core_Shared_Api_Logger$$: logger,
+                    TeqFw_Web_Back_App_Server_Respond$: respond,
+                    TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
+                    Fl64_Tmpl_Back_Service_Render$: tmplRender,
+                    Fl64_Auth_Otp_Back_Store_Mem_XsrfToken$: memXsrfToken,
+                    Fl64_Auth_Otp_Back_Web_Helper$: helper,
+                    Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
+                    Fl64_Auth_Otp_Back_Email_Login$: servEmail,
+                    Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
+                    'Fl64_Auth_Otp_Shared_Enum_Status.default': STATUS,
+                    'Fl64_Auth_Otp_Shared_Enum_Web_Result_Login.default': RESULT,
+                    'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
+                }) {
         // VARS
         const A_EMAIL = repoEmail.getSchema().getAttributes();
         const RESULT_EMAIL = servEmail.getResultCodes();
@@ -72,7 +70,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
                 //  (more tokens in the store - more waiting time)
                 memXsrfToken.set({key: xsrfToken});
                 const {content} = await tmplRender.perform({
-                    pkg: DEF.NAME, type: TMPL_TYPE.WEB, name: 'register.html', view: {xsrfToken},
+                    pkg: DEF.NAME, type: TMPL_TYPE.WEB, name: 'login.html', view: {xsrfToken},
                 });
                 respond.status200(res, content, {
                     [HTTP2_HEADER_CONTENT_TYPE]: 'text/html'
@@ -96,35 +94,23 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
                         await trxWrapper.execute(null, async (trx) => {
                             // check email existence in the plugin data
                             const {record} = await repoEmail.readOne({trx, key: {[A_EMAIL.EMAIL]: email}});
-                            if (!record) {
-                                // check email on the application level
-                                const canRegister = await adapter.canRegisterEmail({trx, email});
-                                if (canRegister) {
-                                    const {id} = await adapter.createUser({trx, email});
-                                    const dto = repoEmail.createDto();
-                                    dto.email = email;
-                                    dto.status = STATUS.UNVERIFIED;
-                                    dto.user_ref = id;
-                                    await repoEmail.createOne({trx, dto});
-                                    const {localeApp, localeUser} = await adapter.getLocales({req});
-                                    const {resultCode} = await servEmail.perform({
-                                        trx,
-                                        userId: id,
-                                        localeUser,
-                                        localeApp
-                                    });
-                                    if (resultCode === RESULT_EMAIL.SUCCESS) {
-                                        respond.status200(res, JSON.stringify({result: RESULT.SUCCESS}), headers);
-                                        memXsrfToken.delete({key: posted.xsrfToken});
-                                    } else
-                                        respond.status500(res, JSON.stringify({result: RESULT.UNDEFINED}), headers);
-                                } else {
-                                    logger.error(`Provided email '${email}' is restricted by the application.`);
-                                    respond.status200(res, JSON.stringify({result: RESULT.EMAIL_NOT_ALLOWED}), headers);
-                                }
+                            if (record && ((record.status === STATUS.VERIFIED) || (record.status === STATUS.UNVERIFIED))) {
+                                // generate OTP and send email for active emails only
+                                const {localeApp, localeUser} = await adapter.getLocales({req});
+                                const {resultCode} = await servEmail.perform({
+                                    trx,
+                                    userId: record.user_ref,
+                                    localeUser,
+                                    localeApp
+                                });
+                                if (resultCode === RESULT_EMAIL.SUCCESS) {
+                                    respond.status200(res, JSON.stringify({result: RESULT.SUCCESS}), headers);
+                                    memXsrfToken.delete({key: posted.xsrfToken});
+                                } else
+                                    respond.status500(res, JSON.stringify({result: RESULT.UNDEFINED}), headers);
                             } else {
-                                logger.error(`Provided email '${email}' is already registered.`);
-                                respond.status200(res, JSON.stringify({result: RESULT.EMAIL_EXISTS}), headers);
+                                logger.error(`Provided email '${email}' is not allowed.`);
+                                respond.status200(res, JSON.stringify({result: RESULT.EMAIL_NOT_ALLOWED}), headers);
                             }
                         });
                     } else {

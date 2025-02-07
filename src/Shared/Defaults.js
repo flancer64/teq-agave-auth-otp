@@ -8,9 +8,7 @@ export default class Fl64_Auth_Otp_Shared_Defaults {
     NAME = '@flancer64/teq-agave-auth-otp';
 
     PARAM_TOKEN = 'token';
-    PLACEHOLDER_OTP = ':otp_token';
-
-    ROUTE_AUTH = 'auth?token=' + this.PLACEHOLDER_OTP;
+    ROUTE_AUTH = 'authenticate';
     ROUTE_LOGIN = 'login';
     ROUTE_REGISTER = 'register';
     ROUTE_VERIFY = 'verify';

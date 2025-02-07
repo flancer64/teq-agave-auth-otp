@@ -9,7 +9,7 @@ const {
 /**
  * Handler for processing ...
  */
-export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
+export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
     /**
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance
@@ -19,10 +19,8 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
      * @param {Fl64_Otp_Back_Mod_Token} modToken
      * @param {Fl64_Web_Session_Back_Manager} mgrSession
      * @param {Fl64_Auth_Otp_Back_Api_Adapter} adapter
-     * @param {Fl64_Auth_Otp_Back_Store_RDb_Repo_Email} repoEmail
      * @param {typeof Fl64_Auth_Otp_Back_Enum_Token_Type} OTP_TYPE
-     * @param {typeof Fl64_Auth_Otp_Shared_Enum_Status} STATUS
-     * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Verify} RESULT
+     * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Authenticate} RESULT
      * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL_TYPE
      */
     constructor(
@@ -35,16 +33,12 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
             Fl64_Otp_Back_Mod_Token$: modToken,
             Fl64_Web_Session_Back_Manager$: mgrSession,
             Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
-            Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
             'Fl64_Auth_Otp_Back_Enum_Token_Type.default': OTP_TYPE,
-            'Fl64_Auth_Otp_Shared_Enum_Status.default': STATUS,
-            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Verify.default': RESULT,
+            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Authenticate.default': RESULT,
             'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
         }
     ) {
         // VARS
-        const A_EMAIL = repoEmail.getSchema().getAttributes();
-
         // MAIN
         /**
          * Handles the provider selection action.
@@ -57,7 +51,6 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
         this.run = async function (req, res) {
             // FUNCS
             /**
-             * Generate HTTP form to register a email address.
              * @param {module:http.IncomingMessage|module:http2.Http2ServerRequest} req - Incoming HTTP request
              * @param {module:http.ServerResponse|module:http2.Http2ServerResponse} res - HTTP response object
              * @returns {Promise<void>}
@@ -70,30 +63,17 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
                 if (token) {
                     await trxWrapper.execute(null, async (trx) => {
                         const {dto} = await modToken.read({trx, token});
-                        if (dto && dto.type === OTP_TYPE.EMAIL_VERIFICATION) {
+                        if (dto && dto.type === OTP_TYPE.AUTHENTICATION) {
                             const userId = dto.user_ref;
-                            const {record: foundEmail} = await repoEmail.readOne({
+                            // initialize session
+                            await mgrSession.establish({
                                 trx,
-                                key: {[A_EMAIL.USER_REF]: userId}
+                                userId,
+                                httpRequest: req,
+                                httpResponse: res
                             });
-                            if (foundEmail && foundEmail.status === STATUS.UNVERIFIED) {
-                                foundEmail.status = STATUS.VERIFIED;
-                                foundEmail.date_verified = new Date();
-                                await repoEmail.updateOne({trx, updates: foundEmail});
-                                logger.info(`Email '${foundEmail.email}' is verified by user.`);
-                                // initialize session
-                                await mgrSession.establish({
-                                    trx,
-                                    userId,
-                                    httpRequest: req,
-                                    httpResponse: res
-                                });
-                                await modToken.delete({trx, id: dto.id});
-                                result = RESULT.SUCCESS;
-                            } else {
-                                // token is not corresponded to valid email record
-                                result = RESULT.WRONG_OTP;
-                            }
+                            await modToken.delete({trx, id: dto.id});
+                            result = RESULT.SUCCESS;
                         } else {
                             // token is not found or has a wrong type
                             result = RESULT.WRONG_OTP;
@@ -106,11 +86,11 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
                 const {content} = await tmplRender.perform({
                     pkg: DEF.NAME,
                     type: TMPL_TYPE.WEB,
-                    name: 'verify.html',
+                    name: 'authenticate.html',
                     view: {
                         isSuccess: result === RESULT.SUCCESS,
-                        isUnknownError: result === RESULT.UNKNOWN_ERROR,
                         isWrongOtp: result === RESULT.WRONG_OTP,
+                        isUnknownError: result === RESULT.UNKNOWN_ERROR,
                     },
                     localeUser,
                     localeApp,

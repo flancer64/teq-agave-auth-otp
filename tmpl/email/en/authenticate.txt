@@ -1,0 +1,14 @@
+Dear User,
+
+You have requested access to your account. To log in, please use the one-time link below:
+
+{{{verifyLink}}}
+
+If the link above does not work, copy and paste it into your browser's address bar.
+
+Please note: this link is valid for a limited time and will become invalid after the first use.
+
+If you did not request this access, you can safely ignore this email.
+
+Best regards,
+Support Team

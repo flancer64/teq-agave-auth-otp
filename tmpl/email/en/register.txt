@@ -2,7 +2,7 @@ Dear User,
 
 Thank you for registering with our service. To complete your registration and activate your account, please confirm your email address by clicking the link below:
 
-{{verifyLink}}
+{{{verifyLink}}}
 
 If the link does not open, copy and paste it into your browser's address bar.
 

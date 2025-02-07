@@ -71,11 +71,17 @@
 <div class="container">
     <h2>Email Verification</h2>
 
-    <p class="message {{#isSuccess}}success{{/isSuccess}}{{#isError}}error{{/isError}}">
-        {{#isSuccess}}Your email has been successfully verified.{{/isSuccess}}
-        {{#isWrongOtp}}Invalid or expired verification link.{{/isWrongOtp}}
-        {{#isUndefined}}Unexpected error. Please try again later.{{/isUndefined}}
-    </p>
+    {{#isSuccess}}
+    <p class="message success">Your email has been successfully verified.</p>
+    {{/isSuccess}}
+
+    {{#isWrongOtp}}
+    <p class="message error">Invalid or expired verification link.</p>
+    {{/isWrongOtp}}
+
+    {{#isUnknownError}}
+    <p class="message error">An unexpected error occurred. Please try again later.</p>
+    {{/isUnknownError}}
 
     <p><a href="/" class="button">Go to Homepage</a></p>
 </div>
