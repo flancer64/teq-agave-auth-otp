@@ -15,7 +15,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
      *
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance
-     * @param {TeqFw_Web_Back_App_Server_Respond} respond
+     * @param {TeqFw_Web_Back_Help_Respond} respond
      * @param {TeqFw_Db_Back_App_TrxWrapper} trxWrapper
      * @param {Fl64_Tmpl_Back_Service_Render} tmplRender
      * @param {Fl64_Auth_Otp_Back_Store_Mem_XsrfToken} memXsrfToken
@@ -27,21 +27,23 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Login} RESULT
      * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL_TYPE
      */
-    constructor({
-                    Fl64_Auth_Otp_Back_Defaults$: DEF,
-                    TeqFw_Core_Shared_Api_Logger$$: logger,
-                    TeqFw_Web_Back_App_Server_Respond$: respond,
-                    TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
-                    Fl64_Tmpl_Back_Service_Render$: tmplRender,
-                    Fl64_Auth_Otp_Back_Store_Mem_XsrfToken$: memXsrfToken,
-                    Fl64_Auth_Otp_Back_Web_Helper$: helper,
-                    Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
-                    Fl64_Auth_Otp_Back_Email_Login$: servEmail,
-                    Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
-                    'Fl64_Auth_Otp_Shared_Enum_Status.default': STATUS,
-                    'Fl64_Auth_Otp_Shared_Enum_Web_Result_Login.default': RESULT,
-                    'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
-                }) {
+    constructor(
+        {
+            Fl64_Auth_Otp_Back_Defaults$: DEF,
+            TeqFw_Core_Shared_Api_Logger$$: logger,
+            TeqFw_Web_Back_Help_Respond$: respond,
+            TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
+            Fl64_Tmpl_Back_Service_Render$: tmplRender,
+            Fl64_Auth_Otp_Back_Store_Mem_XsrfToken$: memXsrfToken,
+            Fl64_Auth_Otp_Back_Web_Helper$: helper,
+            Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
+            Fl64_Auth_Otp_Back_Email_Login$: servEmail,
+            Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
+            'Fl64_Auth_Otp_Shared_Enum_Status.default': STATUS,
+            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Login.default': RESULT,
+            'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
+        }
+    ) {
         // VARS
         const A_EMAIL = repoEmail.getSchema().getAttributes();
         const RESULT_EMAIL = servEmail.getResultCodes();
@@ -69,11 +71,13 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
                 // TODO: I can wait some time before token generation to prevent DoS attacks
                 //  (more tokens in the store - more waiting time)
                 memXsrfToken.set({key: xsrfToken});
-                const {content} = await tmplRender.perform({
+                const {content: body} = await tmplRender.perform({
                     pkg: DEF.NAME, type: TMPL_TYPE.WEB, name: 'login.html', view: {xsrfToken},
                 });
-                respond.status200(res, content, {
-                    [HTTP2_HEADER_CONTENT_TYPE]: 'text/html'
+                respond.code200_Ok({
+                    res, body, headers: {
+                        [HTTP2_HEADER_CONTENT_TYPE]: 'text/html'
+                    }
                 });
             }
 
@@ -104,22 +108,32 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
                                     localeApp
                                 });
                                 if (resultCode === RESULT_EMAIL.SUCCESS) {
-                                    respond.status200(res, JSON.stringify({result: RESULT.SUCCESS}), headers);
+                                    respond.code200_Ok({
+                                        res, body: JSON.stringify({result: RESULT.SUCCESS}), headers
+                                    });
                                     memXsrfToken.delete({key: posted.xsrfToken});
                                 } else
-                                    respond.status500(res, JSON.stringify({result: RESULT.UNDEFINED}), headers);
+                                    respond.code500_InternalServerError({
+                                        res, body: JSON.stringify({result: RESULT.UNDEFINED}), headers
+                                    });
                             } else {
                                 logger.error(`Provided email '${email}' is not allowed.`);
-                                respond.status200(res, JSON.stringify({result: RESULT.EMAIL_NOT_ALLOWED}), headers);
+                                respond.code200_Ok({
+                                    res, body: JSON.stringify({result: RESULT.EMAIL_NOT_ALLOWED}), headers
+                                });
                             }
                         });
                     } else {
                         logger.error(`Provided XSRF token '${posted?.xsrfToken}' is not found in the memory storage.`);
-                        respond.status200(res, JSON.stringify({result: RESULT.WRONG_XSRF}), headers);
+                        respond.code200_Ok({
+                            res, body: JSON.stringify({result: RESULT.WRONG_XSRF}), headers
+                        });
                     }
                 } else {
                     logger.error(`Not enough data is provided in the request.`);
-                    respond.status500(res, JSON.stringify({result: RESULT.UNDEFINED}), headers);
+                    respond.code500_InternalServerError({
+                        res, body: JSON.stringify({result: RESULT.UNDEFINED}), headers
+                    });
                 }
             }
 
