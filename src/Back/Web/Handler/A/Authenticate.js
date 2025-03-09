@@ -2,7 +2,7 @@ import {constants as H2} from 'node:http2';
 
 // VARS
 const {
-    HTTP2_HEADER_CONTENT_RESULT,
+    HTTP2_HEADER_CONTENT_TYPE,
     HTTP2_HEADER_LOCATION,
     HTTP2_METHOD_GET,
 } = H2;
@@ -119,7 +119,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
                     respond.code200_Ok({
                         res,
                         body,
-                        headers: {[HTTP2_HEADER_CONTENT_RESULT]: 'text/html'}
+                        headers: {[HTTP2_HEADER_CONTENT_TYPE]: 'text/html'}
                     });
                 }
             }
