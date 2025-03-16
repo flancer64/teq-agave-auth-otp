@@ -1,11 +1,3 @@
-import {constants as H2} from 'node:http2';
-import {randomUUID} from 'node:crypto';
-
-// VARS
-const {
-    HTTP2_HEADER_CONTENT_TYPE, HTTP2_METHOD_GET, HTTP2_METHOD_POST,
-} = H2;
-
 /**
  * Handler for processing user email registration requests.
  */
@@ -13,6 +5,8 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
     /**
      * Initializes the registration handler.
      *
+     * @param {typeof import('node:crypto')} crypto
+     * @param {typeof import('node:http2')} http2
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance
      * @param {TeqFw_Web_Back_Help_Respond} respond
@@ -29,6 +23,8 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
      */
     constructor(
         {
+            'node:crypto': crypto,
+            'node:http2': http2,
             Fl64_Auth_Otp_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_Help_Respond$: respond,
@@ -45,6 +41,13 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
         }
     ) {
         // VARS
+        const {
+            HTTP2_HEADER_CONTENT_TYPE,
+            HTTP2_METHOD_GET,
+            HTTP2_METHOD_POST,
+        } = http2.constants;
+        const {randomUUID} = crypto;
+
         const A_EMAIL = repoEmail.getSchema().getAttributes();
         const RESULT_EMAIL = servEmail.getResultCodes();
 

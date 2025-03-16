@@ -1,17 +1,9 @@
-import {constants as H2} from 'node:http2';
-
-// VARS
-const {
-    HTTP2_HEADER_CONTENT_TYPE,
-    HTTP2_HEADER_LOCATION,
-    HTTP2_METHOD_GET,
-} = H2;
-
 /**
  * Handler for processing OTP authentication when a user accesses the link from email
  */
 export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
     /**
+     * @param {typeof import('node:http2')} http2
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF - Default configurations and constants
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance for logging actions and errors
      * @param {TeqFw_Web_Back_Help_Respond} respond - Helper to respond to the client with HTTP codes and data
@@ -26,6 +18,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
      */
     constructor(
         {
+            'node:http2': http2,
             Fl64_Auth_Otp_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_Help_Respond$: respond,
@@ -40,6 +33,12 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
         }
     ) {
         // VARS
+        const {
+            HTTP2_HEADER_CONTENT_TYPE,
+            HTTP2_HEADER_LOCATION,
+            HTTP2_METHOD_GET,
+        } = http2.constants;
+
         // MAIN
         /**
          * @param {module:http.IncomingMessage|module:http2.Http2ServerRequest} req - Incoming HTTP request object

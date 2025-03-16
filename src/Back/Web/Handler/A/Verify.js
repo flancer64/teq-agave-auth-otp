@@ -1,17 +1,10 @@
-import {constants as H2} from 'node:http2';
-
-// VARS
-const {
-    HTTP2_HEADER_CONTENT_TYPE,
-    HTTP2_METHOD_GET,
-} = H2;
-
 /**
  * Handler for verifying the email address of a user during registration
  * after they click the verification link sent to their email.
  */
 export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
     /**
+     * @param {typeof import('node:http2')} http2
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF - Default configuration and constants
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance to log actions
      * @param {TeqFw_Web_Back_Help_Respond} respond - Helper for sending HTTP responses
@@ -28,6 +21,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
      */
     constructor(
         {
+            'node:http2': http2,
             Fl64_Auth_Otp_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_Help_Respond$: respond,
@@ -44,6 +38,10 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
         }
     ) {
         // VARS
+        const {
+            HTTP2_HEADER_CONTENT_TYPE,
+            HTTP2_METHOD_GET,
+        } = http2.constants;
         // Retrieve email schema attributes from the email repository
         const A_EMAIL = repoEmail.getSchema().getAttributes();
 
