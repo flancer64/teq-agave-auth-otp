@@ -8,8 +8,9 @@ const container = new Container();
 
 // Configure the resolver for handling dependencies by namespace.
 const resolver = container.getResolver();
-resolver.addNamespaceRoot('Fl64_Auth_Otp_', '/src/@flancer64/teq-agave-auth-otp'); // Project namespace
-resolver.addNamespaceRoot('TeqFw_Core_', '/src/@teqfw/core', 'mjs'); // Core plugin namespace
-resolver.addNamespaceRoot('TeqFw_Web_', '/src/@teqfw/web', 'mjs'); // Web plugin namespace
+resolver.addNamespaceRoot('Fl64_Auth_Otp_', '/src/@flancer64/teq-agave-auth-otp');
+resolver.addNamespaceRoot('TeqFw_Core_', '/src/@teqfw/core', 'mjs');
+resolver.addNamespaceRoot('TeqFw_Di_', '/src/@teqfw/di', 'js');
+resolver.addNamespaceRoot('TeqFw_Web_', '/src/@teqfw/web', 'mjs');
 
 export default container;
