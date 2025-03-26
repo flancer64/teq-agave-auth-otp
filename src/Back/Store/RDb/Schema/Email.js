@@ -85,7 +85,7 @@ export default class Fl64_Auth_Otp_Back_Store_RDb_Schema_Email {
         {
             Fl64_Auth_Otp_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Util_Cast$: cast,
-            'Fl64_Auth_Otp_Shared_Enum_Status.default': STATUS,
+            Fl64_Auth_Otp_Shared_Enum_Status$: STATUS,
         }
     ) {
         // INSTANCE METHODS

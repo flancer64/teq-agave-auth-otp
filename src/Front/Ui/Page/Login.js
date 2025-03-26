@@ -8,7 +8,7 @@ export default class Fl64_Auth_Otp_Front_Ui_Page_Login {
         {
             Fl64_Auth_Otp_Front_Defaults$: DEF,
             Fl64_Auth_Otp_Shared_Dto_Post_Register$: dtoPost,
-            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Login.default': RESULT
+            Fl64_Auth_Otp_Shared_Enum_Web_Result_Login$: RESULT
         }
     ) {
         // VARS

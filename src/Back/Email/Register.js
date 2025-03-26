@@ -44,8 +44,8 @@ export default class Fl64_Auth_Otp_Back_Email_Register {
             Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
             Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
             Fl64_Otp_Back_Mod_Token$: modToken,
-            'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
-            'Fl64_Auth_Otp_Back_Enum_Token_Type.default': TOKEN,
+            Fl64_Tmpl_Back_Enum_Type$: TMPL_TYPE,
+            Fl64_Auth_Otp_Back_Enum_Token_Type$: TOKEN,
         }
     ) {
         // VARS

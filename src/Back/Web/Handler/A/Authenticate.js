@@ -27,9 +27,9 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
             Fl64_Otp_Back_Mod_Token$: modToken,
             Fl64_Web_Session_Back_Manager$: session,
             Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
-            'Fl64_Auth_Otp_Back_Enum_Token_Type.default': OTP_TYPE,
-            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Authenticate.default': RESULT,
-            'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
+            Fl64_Auth_Otp_Back_Enum_Token_Type$: OTP_TYPE,
+            Fl64_Auth_Otp_Shared_Enum_Web_Result_Authenticate$: RESULT,
+            Fl64_Tmpl_Back_Enum_Type$: TMPL_TYPE,
         }
     ) {
         // VARS

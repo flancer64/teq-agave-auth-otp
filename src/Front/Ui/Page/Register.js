@@ -6,7 +6,7 @@ export default class Fl64_Auth_Otp_Front_Ui_Page_Register {
     constructor(
         {
             Fl64_Auth_Otp_Shared_Dto_Post_Register$: dtoPost,
-            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Register.default': RESULT
+            Fl64_Auth_Otp_Shared_Enum_Web_Result_Register$: RESULT
         }
     ) {
         // FUNCS

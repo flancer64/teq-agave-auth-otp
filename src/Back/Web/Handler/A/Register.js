@@ -35,9 +35,9 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
             Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
             Fl64_Auth_Otp_Back_Email_Register$: servEmail,
             Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
-            'Fl64_Auth_Otp_Shared_Enum_Status.default': STATUS,
-            'Fl64_Auth_Otp_Shared_Enum_Web_Result_Register.default': RESULT,
-            'Fl64_Tmpl_Back_Enum_Type.default': TMPL_TYPE,
+            Fl64_Auth_Otp_Shared_Enum_Status$: STATUS,
+            Fl64_Auth_Otp_Shared_Enum_Web_Result_Register$: RESULT,
+            Fl64_Tmpl_Back_Enum_Type$: TMPL_TYPE,
         }
     ) {
         // VARS
