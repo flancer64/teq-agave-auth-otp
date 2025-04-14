@@ -9,15 +9,13 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance to log actions
      * @param {TeqFw_Web_Back_Help_Respond} respond - Helper for sending HTTP responses
      * @param {TeqFw_Db_Back_App_TrxWrapper} trxWrapper - Transaction wrapper for database interactions
-     * @param {Fl64_Tmpl_Back_Service_Render} tmplRender - Template renderer for generating HTML responses
+     * @param {Fl64_Tmpl_Back_Service_Render_Web} srvRender - Template renderer for generating HTML responses
      * @param {Fl64_Otp_Back_Mod_Token} modToken - OTP token model for handling OTP tokens
      * @param {Fl64_Web_Session_Back_Manager} session - Session manager to manage user sessions
-     * @param {Fl64_Auth_Otp_Back_Api_Adapter} adapter - API adapter for interacting with external services like locales
      * @param {Fl64_Auth_Otp_Back_Store_RDb_Repo_Email} repoEmail - Repository for managing email-related data
      * @param {typeof Fl64_Auth_Otp_Back_Enum_Token_Type} OTP_TYPE - Enum for OTP token types
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Status} STATUS - Enum for email verification status
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Verify} RESULT - Enum for the result of the verification process
-     * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL_TYPE - Enum for template types
      */
     constructor(
         {
@@ -26,15 +24,13 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_Help_Respond$: respond,
             TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
-            Fl64_Tmpl_Back_Service_Render$: tmplRender,
+            Fl64_Tmpl_Back_Service_Render_Web$: srvRender,
             Fl64_Otp_Back_Mod_Token$: modToken,
             Fl64_Web_Session_Back_Manager$: session,
-            Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
             Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
             Fl64_Auth_Otp_Back_Enum_Token_Type$: OTP_TYPE,
             Fl64_Auth_Otp_Shared_Enum_Status$: STATUS,
             Fl64_Auth_Otp_Shared_Enum_Web_Result_Verify$: RESULT,
-            Fl64_Tmpl_Back_Enum_Type$: TMPL_TYPE,
         }
     ) {
         // VARS
@@ -114,24 +110,18 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
                     result = RESULT.WRONG_OTP;
                 }
 
-                // Retrieve the user's and app's locale settings for the response
-                const {localeApp, localeUser} = await adapter.getLocales({req});
-
                 // Render the verification result page with appropriate status
-                const {content: body} = await tmplRender.perform({
-                    pkg: DEF.NAME,
-                    type: TMPL_TYPE.WEB,
+                const {content: body} = await srvRender.perform({
                     name: 'verify.html',
+                    pkg: DEF.NAME,
+                    localePkg: DEF.LOCALE,
                     view: {
                         isSuccess: result === RESULT.SUCCESS,
                         isUnknownError: result === RESULT.UNKNOWN_ERROR,
                         isWrongOtp: result === RESULT.WRONG_OTP,
                     },
-                    localeUser,
-                    localeApp,
-                    localePkg: DEF.LOCALE,
+                    req,
                 });
-
                 // Send a response with the rendered content
                 respond.code200_Ok({
                     res,

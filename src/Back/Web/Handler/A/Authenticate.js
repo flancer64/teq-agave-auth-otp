@@ -8,13 +8,11 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance for logging actions and errors
      * @param {TeqFw_Web_Back_Help_Respond} respond - Helper to respond to the client with HTTP codes and data
      * @param {TeqFw_Db_Back_App_TrxWrapper} trxWrapper - Transaction wrapper for database operations
-     * @param {Fl64_Tmpl_Back_Service_Render} tmplRender - Template renderer to render HTML responses
+     * @param {Fl64_Tmpl_Back_Service_Render_Web} srvRender - Template renderer to render HTML responses
      * @param {Fl64_Otp_Back_Mod_Token} modToken - OTP token model to manage OTP tokens
      * @param {Fl64_Web_Session_Back_Manager} session - Session manager for user session handling
-     * @param {Fl64_Auth_Otp_Back_Api_Adapter} adapter - Adapter to interact with external services for locales
      * @param {typeof Fl64_Auth_Otp_Back_Enum_Token_Type} OTP_TYPE - Enum for OTP token types
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Authenticate} RESULT - Enum for authentication results
-     * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL_TYPE - Enum for template types
      */
     constructor(
         {
@@ -23,13 +21,11 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
             TeqFw_Core_Shared_Api_Logger$$: logger,
             TeqFw_Web_Back_Help_Respond$: respond,
             TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
-            Fl64_Tmpl_Back_Service_Render$: tmplRender,
+            Fl64_Tmpl_Back_Service_Render_Web$: srvRender,
             Fl64_Otp_Back_Mod_Token$: modToken,
             Fl64_Web_Session_Back_Manager$: session,
-            Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
             Fl64_Auth_Otp_Back_Enum_Token_Type$: OTP_TYPE,
             Fl64_Auth_Otp_Shared_Enum_Web_Result_Authenticate$: RESULT,
-            Fl64_Tmpl_Back_Enum_Type$: TMPL_TYPE,
         }
     ) {
         // VARS
@@ -60,9 +56,9 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
                 const url = new URL(req.url, `https://${req.headers.host}`);
                 const token = url.searchParams.get(DEF.SHARED.PARAM_TOKEN);
 
-                if (token) {
-                    // If a token is present, start a transaction to process it
-                    await trxWrapper.execute(null, async (trx) => {
+                // If a token is present, start a transaction to process it
+                await trxWrapper.execute(null, async (trx) => {
+                    if (token) {
                         // Read token details from the database
                         const {dto} = await modToken.read({trx, token});
                         if (dto && dto.type === OTP_TYPE.AUTHENTICATION) {
@@ -83,44 +79,43 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Authenticate {
                             // Token not found or it has an invalid type
                             result = RESULT.WRONG_OTP;
                         }
-                    });
-                } else {
-                    result = RESULT.WRONG_OTP;
-                }
+                    } else {
+                        result = RESULT.WRONG_OTP;
+                    }
 
-                // Redirect the user if a valid redirect URL is present in the session
-                const {url: redirectUrl} = await session.retrieveRedirectUrl({req, remove: true});
-                if ((result === RESULT.SUCCESS) && redirectUrl) {
-                    // Send a 303 redirect response
-                    respond.code303_SeeOther({
-                        res,
-                        headers: {[HTTP2_HEADER_LOCATION]: redirectUrl}
-                    });
-                    logger.info(`User is authenticated and redirected to '${redirectUrl}'.`);
-                } else {
-                    // Return a default web page with a message about login status
-                    const {localeApp, localeUser} = await adapter.getLocales({req});
-                    const {content: body} = await tmplRender.perform({
-                        pkg: DEF.NAME,
-                        type: TMPL_TYPE.WEB,
-                        name: 'authenticate.html',
-                        view: {
-                            isSuccess: result === RESULT.SUCCESS,
-                            isWrongOtp: result === RESULT.WRONG_OTP,
-                            isUnknownError: result === RESULT.UNKNOWN_ERROR,
-                        },
-                        localeUser,
-                        localeApp,
-                        localePkg: DEF.LOCALE,
-                    });
+                    // Redirect the user if a valid redirect URL is present in the session
+                    const {url: redirectUrl} = await session.retrieveRedirectUrl({req, remove: true});
+                    if ((result === RESULT.SUCCESS) && redirectUrl) {
+                        // Send a 303 redirect response
+                        respond.code303_SeeOther({
+                            res,
+                            headers: {[HTTP2_HEADER_LOCATION]: redirectUrl}
+                        });
+                        logger.info(`User is authenticated and redirected to '${redirectUrl}'.`);
+                    } else {
+                        // Return a default web page with a message about login status
+                        const {content: body} = await srvRender.perform({
+                            name: 'authenticate.html',
+                            pkg: DEF.NAME,
+                            localePkg: DEF.LOCALE,
+                            view: {
+                                isSuccess: result === RESULT.SUCCESS,
+                                isWrongOtp: result === RESULT.WRONG_OTP,
+                                isUnknownError: result === RESULT.UNKNOWN_ERROR,
+                            },
+                            req,
+                            trx,
+                        });
 
-                    // Respond with an HTML page and an appropriate message
-                    respond.code200_Ok({
-                        res,
-                        body,
-                        headers: {[HTTP2_HEADER_CONTENT_TYPE]: 'text/html'}
-                    });
-                }
+                        // Respond with an HTML page and an appropriate message
+                        respond.code200_Ok({
+                            res,
+                            body,
+                            headers: {[HTTP2_HEADER_CONTENT_TYPE]: 'text/html'}
+                        });
+                    }
+                });
+
             }
 
             // MAIN

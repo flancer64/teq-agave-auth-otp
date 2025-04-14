@@ -45,6 +45,7 @@ export default class Fl64_Auth_Otp_Back_Api_Adapter {
      *          - `localeUser`: Preferred locale extracted from the `Accept-Language` header.
      *          - `localeApp`: Default application locale, usually configured globally.
      * @throws {Error} Must be implemented in the application.
+     * @deprecated I use template plugin for page rendering
      */
     async getLocales({req}) {
         throw new Error('Cannot instantiate an interface');
