@@ -13,4 +13,6 @@ resolver.addNamespaceRoot('TeqFw_Core_', '/src/@teqfw/core', 'mjs');
 resolver.addNamespaceRoot('TeqFw_Di_', '/src/@teqfw/di', 'js');
 resolver.addNamespaceRoot('TeqFw_Web_', '/src/@teqfw/web', 'mjs');
 
-export default container;
+// Export the shared container instance for use across modules.
+Object.freeze(container);
+export {container};

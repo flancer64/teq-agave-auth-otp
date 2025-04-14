@@ -97,11 +97,10 @@
 </div>
 
 <script type="module">
-    /** @type {TeqFw_Di_Container} */
-    import container from '/web/@flancer64/teq-agave-auth-otp/js/di.js';
-
-    /** @type {Fl64_Auth_Otp_Front_Ui_Page_Register} */
-    const page = await container.get('Fl64_Auth_Otp_Front_Ui_Page_Login$');
+    import('/web/@flancer64/teq-agave-auth-otp/js/di.js')
+        .then(({container}) => {
+            container.get('Fl64_Auth_Otp_Front_Ui_Page_Login$');
+        }).catch(console.error);
 </script>
 </body>
 </html>
