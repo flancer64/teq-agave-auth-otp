@@ -5,7 +5,6 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
     /**
      * Initializes the registration handler.
      *
-     * @param {typeof import('node:crypto')} crypto
      * @param {typeof import('node:http2')} http2
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance
@@ -22,7 +21,6 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
      */
     constructor(
         {
-            'node:crypto': crypto,
             'node:http2': http2,
             Fl64_Auth_Otp_Back_Defaults$: DEF,
             TeqFw_Core_Shared_Api_Logger$$: logger,
@@ -44,7 +42,6 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
             HTTP2_METHOD_GET,
             HTTP2_METHOD_POST,
         } = http2.constants;
-        const {randomUUID} = crypto;
 
         const A_EMAIL = repoEmail.getSchema().getAttributes();
         const RESULT_EMAIL = servEmail.getResultCodes();
@@ -67,11 +64,10 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
              * @returns {Promise<void>}
              */
             async function doGet(req, res) {
-                // generate XSRF token and render the from
-                const xsrfToken = randomUUID();
                 // TODO: I can wait some time before token generation to prevent DoS attacks
                 //  (more tokens in the store - more waiting time)
-                memXsrfToken.set({key: xsrfToken});
+                // generate XSRF token and render the from
+                const xsrfToken = memXsrfToken.create();
                 const {content: body} = await srvRender.perform({
                     name: 'login.html',
                     pkg: DEF.NAME,

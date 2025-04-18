@@ -5,14 +5,17 @@
  */
 export default class Fl64_Auth_Otp_Back_Store_Mem_XsrfToken {
     /**
+     * @param {typeof import('node:crypto')} crypto
      * @param {TeqFw_Core_Shared_Api_Logger} logger - Logger instance.
      */
     constructor(
         {
+            'node:crypto': crypto,
             TeqFw_Core_Shared_Api_Logger$$: logger,
         }
     ) {
         // VARS
+        const {randomUUID} = crypto;
         const store = new Map();
         let maxSize = 1000;
         let defaultLifetime = 600000; // 10 min
@@ -56,6 +59,16 @@ export default class Fl64_Auth_Otp_Back_Store_Mem_XsrfToken {
          */
         this.configMaxSize = function (data) {
             maxSize = data;
+        };
+
+        /**
+         * Creates a new random token and stores it in the store.
+         * @returns {string}
+         */
+        this.create = function () {
+            const res = randomUUID();
+            this.set({key: res});
+            return res;
         };
 
         /**
@@ -125,7 +138,7 @@ export default class Fl64_Auth_Otp_Back_Store_Mem_XsrfToken {
             }
 
             store.set(key, {expiresAt: finalExpiresAt});
-            logger.info(`XSRF token stored: ${key}`);
+            logger.info(`XSRF token stored: ${key.substring(0, 8)}...`);
         };
     }
 }
