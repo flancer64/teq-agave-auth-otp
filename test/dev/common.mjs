@@ -1,7 +1,7 @@
 import {configDto} from '@teqfw/test';
 
 /**
- * @param {TeqFw_Di_Api_Container} container
+ * @param {TeqFw_Di_Container} container
  * @return {Promise<void>}
  */
 export async function dbConnect(container) {
@@ -18,7 +18,7 @@ export async function dbConnect(container) {
 }
 
 /**
- * @param {TeqFw_Di_Api_Container} container
+ * @param {TeqFw_Di_Container} container
  * @return {Promise<void>}
  */
 export async function dbDisconnect(container) {
@@ -33,7 +33,7 @@ export async function dbDisconnect(container) {
 
 
 /**
- * @param {TeqFw_Di_Api_Container} container
+ * @param {TeqFw_Di_Container} container
  * @return {Promise<void>}
  */
 export async function initConfig(container) {
