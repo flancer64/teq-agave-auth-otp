@@ -39,6 +39,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
         // VARS
         const {
             HTTP2_HEADER_CONTENT_TYPE,
+            HTTP2_HEADER_LOCATION,
             HTTP2_METHOD_GET,
             HTTP2_METHOD_POST,
         } = http2.constants;
@@ -100,23 +101,37 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
                             // check email existence in the plugin data
                             const {record} = await repoEmail.readOne({trx, key: {[A_EMAIL.EMAIL]: email}});
                             if (record && ((record.status === STATUS.VERIFIED) || (record.status === STATUS.UNVERIFIED))) {
-                                // generate OTP and send email for active emails only
-                                const {localeApp, localeUser} = await adapter.getLocales({req});
-                                const {resultCode} = await servEmail.perform({
-                                    trx,
-                                    userId: record.user_ref,
-                                    localeUser,
-                                    localeApp
-                                });
-                                if (resultCode === RESULT_EMAIL.SUCCESS) {
-                                    respond.code200_Ok({
-                                        res, body: JSON.stringify({result: RESULT.SUCCESS}), headers
+                                const {ok, uri403} = await adapter.canAuthenticateUser({trx, userId: record.user_ref});
+                                if (ok) {
+                                    // generate OTP and send email for active emails only
+                                    const {localeApp, localeUser} = await adapter.getLocales({req});
+                                    const {resultCode} = await servEmail.perform({
+                                        trx,
+                                        userId: record.user_ref,
+                                        localeUser,
+                                        localeApp
                                     });
-                                    memXsrfToken.delete({key: posted.xsrfToken});
-                                } else
-                                    respond.code500_InternalServerError({
-                                        res, body: JSON.stringify({result: RESULT.UNDEFINED}), headers
-                                    });
+                                    if (resultCode === RESULT_EMAIL.SUCCESS) {
+                                        respond.code200_Ok({
+                                            res, body: JSON.stringify({result: RESULT.SUCCESS}), headers
+                                        });
+                                        memXsrfToken.delete({key: posted.xsrfToken});
+                                    } else
+                                        respond.code500_InternalServerError({
+                                            res, body: JSON.stringify({result: RESULT.UNDEFINED}), headers
+                                        });
+                                } else {
+
+                                    if (uri403) {
+                                        respond.code303_SeeOther({
+                                            res,
+                                            headers: {[HTTP2_HEADER_LOCATION]: uri403},
+                                            body: JSON.stringify({result: RESULT.ERR_403})
+                                        });
+                                    } else {
+                                        respond.code401_Unauthorized({res});
+                                    }
+                                }
                             } else {
                                 logger.error(`Provided email '${email}' is not allowed.`);
                                 respond.code200_Ok({

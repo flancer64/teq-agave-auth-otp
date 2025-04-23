@@ -72,12 +72,16 @@ export default class Fl64_Auth_Otp_Front_Ui_Page_Login {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(body),
                 });
-
-                const result = await response.json();
-                if (response.ok && result.result === RESULT.SUCCESS) {
-                    successMsg.style.display = 'block';
+                // TODO: this is a POST request, it returns 200 OK on 303 Redirect.
+                if (response.url) {
+                    window.location.href = response.url;
                 } else {
-                    handleError(result.result);
+                    const result = await response.json();
+                    if (response.ok && result.result === RESULT.SUCCESS) {
+                        successMsg.style.display = 'block';
+                    } else {
+                        handleError(result.result);
+                    }
                 }
             } catch (error) {
                 handleError(RESULT.UNDEFINED);

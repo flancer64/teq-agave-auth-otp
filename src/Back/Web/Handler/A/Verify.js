@@ -64,7 +64,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
                 const token = url.searchParams.get(DEF.SHARED.PARAM_TOKEN);
 
                 if (token) {
-                    // If token exists, initiate a database transaction to process it
+                    // If a token exists, initiate a database transaction to process it
                     await trxWrapper.execute(null, async (trx) => {
                         // Read the token data from the OTP token model
                         const {dto} = await modToken.read({trx, token});
@@ -110,7 +110,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
                     result = RESULT.WRONG_OTP;
                 }
 
-                // Render the verification result page with appropriate status
+                // Render the verification result page with the appropriate status
                 const {content: body} = await srvRender.perform({
                     name: 'verify.html',
                     pkg: DEF.NAME,
@@ -131,7 +131,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
             }
 
             // MAIN
-            // Process only GET requests for email verification
+            // Process only GETS requests for email verification
             if (req.method === HTTP2_METHOD_GET) {
                 await doGet(req, res);
             }
