@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Successful</title>
+    <style>
+        :root {
+            --primary-color: #005f3f;
+            --background-color: #f4e1c1;
+            --text-color: #333;
+            --container-bg: white;
+            --button-radius: 4px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #222;
+                --text-color: #ddd;
+                --container-bg: #333;
+            }
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 360px;
+            margin: auto;
+            background: var(--container-bg);
+            padding: 20px;
+            border-radius: var(--button-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            display: inline-block;
+            background: #004d30;
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--button-radius);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: #008f5a;
+        }
+
+        .note {
+            font-size: 14px;
+            margin-top: 10px;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Login Successful</h2>
+    <p>Your one-time login was successful. You are now signed in to your account.</p>
+    <p class="note">If this was not you, please contact support immediately.</p>
+</div>
+</body>
+</html>

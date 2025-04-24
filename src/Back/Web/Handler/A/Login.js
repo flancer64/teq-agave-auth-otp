@@ -14,7 +14,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
      * @param {Fl64_Auth_Otp_Back_Store_Mem_XsrfToken} memXsrfToken
      * @param {Fl64_Auth_Otp_Back_Web_Helper} helper
      * @param {Fl64_Auth_Otp_Back_Api_Adapter} adapter
-     * @param {Fl64_Auth_Otp_Back_Email_Login} servEmail
+     * @param {Fl64_Auth_Otp_Back_Email_SignIn_Init} servEmail
      * @param {Fl64_Auth_Otp_Back_Store_RDb_Repo_Email} repoEmail
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Status} STATUS
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Login} RESULT
@@ -30,7 +30,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
             Fl64_Auth_Otp_Back_Store_Mem_XsrfToken$: memXsrfToken,
             Fl64_Auth_Otp_Back_Web_Helper$: helper,
             Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
-            Fl64_Auth_Otp_Back_Email_Login$: servEmail,
+            Fl64_Auth_Otp_Back_Email_SignIn_Init$: servEmail,
             Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
             Fl64_Auth_Otp_Shared_Enum_Status$: STATUS,
             Fl64_Auth_Otp_Shared_Enum_Web_Result_Login$: RESULT,
@@ -101,7 +101,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
                             // check email existence in the plugin data
                             const {record} = await repoEmail.readOne({trx, key: {[A_EMAIL.EMAIL]: email}});
                             if (record && ((record.status === STATUS.VERIFIED) || (record.status === STATUS.UNVERIFIED))) {
-                                const {ok, uri403} = await adapter.canAuthenticateUser({trx, userId: record.user_ref});
+                                const {ok, uri401} = await adapter.canAuthenticateUser({trx, userId: record.user_ref});
                                 if (ok) {
                                     // generate OTP and send email for active emails only
                                     const {localeApp, localeUser} = await adapter.getLocales({req});
@@ -121,15 +121,17 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
                                             res, body: JSON.stringify({result: RESULT.UNDEFINED}), headers
                                         });
                                 } else {
-
-                                    if (uri403) {
+                                    if (uri401) {
                                         respond.code303_SeeOther({
                                             res,
-                                            headers: {[HTTP2_HEADER_LOCATION]: uri403},
-                                            body: JSON.stringify({result: RESULT.ERR_403})
+                                            headers: {[HTTP2_HEADER_LOCATION]: uri401},
+                                            body: JSON.stringify({result: RESULT.ERR_401}),
                                         });
                                     } else {
-                                        respond.code401_Unauthorized({res});
+                                        respond.code401_Unauthorized({
+                                            res,
+                                            body: JSON.stringify({result: RESULT.ERR_401})
+                                        });
                                     }
                                 }
                             } else {

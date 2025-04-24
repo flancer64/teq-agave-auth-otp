@@ -1,6 +1,6 @@
 {
   "subject": "Sign In Using Your One-Time Link",
-  "variables": [
-    "verifyLink"
-  ]
+  "variables": {
+    "signInLink": "string"
+  }
 }

@@ -1,3 +1,5 @@
 {
-  "vars": ["xsrfToken"]
+  "vars": {
+    "xsrfToken": "string"
+  }
 }

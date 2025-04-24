@@ -1,0 +1,8 @@
+Dear User,
+
+Your one-time login was successful. You are now signed in to your account.
+
+If this was not you, please contact support immediately.
+
+Best regards,
+Support Team

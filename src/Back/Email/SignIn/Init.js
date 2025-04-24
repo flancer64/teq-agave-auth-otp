@@ -1,25 +1,9 @@
 /**
- * Operation to send a verification email for user email address verification.
- */
-// VARS
-/**
- * @memberOf Fl64_Auth_Otp_Back_Email_Register
- */
-const RESULT_CODES = {
-    EMAIL_SEND_FAILED: 'EMAIL_SEND_FAILED',
-    SUCCESS: 'SUCCESS',
-    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-    USER_NOT_FOUND: 'USER_NOT_FOUND',
-};
-Object.freeze(RESULT_CODES);
-
-const OTP_LIFETIME = 24 * 3600; // 24 hours in seconds
-
-// MAIN
-/**
+ * Service that initializes one-time sign-in by sending a login link via email.
+ *
  * @implements TeqFw_Core_Shared_Api_Service
  */
-export default class Fl64_Auth_Otp_Back_Email_Register {
+export default class Fl64_Auth_Otp_Back_Email_SignIn_Init {
     /**
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF
      * @param {TeqFw_Core_Back_Config} config
@@ -50,28 +34,30 @@ export default class Fl64_Auth_Otp_Back_Email_Register {
     ) {
         // VARS
         const A_EMAIL = repoEmail.getSchema().getAttributes();
+        const OTP_LIFETIME = 24 * 3600; // 24 hours in seconds
+        const TMPL = 'signin/init';
         let URL_BASE;
 
         // FUNCS
 
         /**
-         * Retrieves the URL for verification links.
-         * This is constructed from the application configuration.
+         * Constructs the URL for one-time sign-in using the generated token.
          * @param {string} token
          * @return {string}
          */
-        function composeVerifyUrl(token) {
+        function composeSignInUrl(token) {
             if (!URL_BASE) {
                 const web = config.getLocal(DEF.SHARED.MOD_WEB.NAME);
                 const base = web.urlBase;
                 const space = DEF.SHARED.SPACE;
                 const param = DEF.SHARED.PARAM_TOKEN;
-                URL_BASE = `https://${base}/${space}/${DEF.SHARED.ROUTE_VERIFY}?${param}=`;
+                URL_BASE = `https://${base}/${space}/${DEF.SHARED.ROUTE_AUTH}?${param}=`;
             }
             return URL_BASE + token;
         }
 
         /**
+         * Renders HTML and plain text email content based on templates.
          * @param {TeqFw_Db_Back_RDb_ITrans} trx
          * @param {Fl64_Auth_Otp_Back_Store_RDb_Schema_Email.Dto} email
          * @param {string} localeUser
@@ -79,22 +65,19 @@ export default class Fl64_Auth_Otp_Back_Email_Register {
          * @returns {Promise<{html:string, text:string, subject:string}>}
          */
         async function prepareContent(trx, email, localeUser, localeApp) {
-            // create OTP-token to compose verification link
+            // create OTP-token to compose a verification link
             const {token} = await modToken.create({
-                trx,
-                userId: email.user_ref,
-                type: TOKEN.EMAIL_VERIFICATION,
-                lifetime: OTP_LIFETIME
+                trx, userId: email.user_ref, type: TOKEN.AUTHENTICATION, lifetime: OTP_LIFETIME
             });
-            const verifyLink = composeVerifyUrl(token);
+            const signInLink = composeSignInUrl(token);
             // load application level vars and partials for template processing
-            const {vars: appVars, partials} = await adapter.getTmplDataEmailRegister({trx, userId: email.user_ref});
-            const view = {verifyLink, ...appVars};
+            const {vars: appVars, partials} = await adapter.getTmplDataEmailAuthenticate({trx, userId: email.user_ref});
+            const view = {signInLink, ...appVars};
             // render HTML & text templates
             const {content: html} = await servRender.perform({
                 pkg: DEF.NAME,
                 type: TMPL_TYPE.EMAIL,
-                name: 'register.html',
+                name: TMPL + '/body.html',
                 localeUser,
                 localeApp,
                 localePkg: DEF.LOCALE,
@@ -104,7 +87,7 @@ export default class Fl64_Auth_Otp_Back_Email_Register {
             const {content: text} = await servRender.perform({
                 pkg: DEF.NAME,
                 type: TMPL_TYPE.EMAIL,
-                name: 'register.txt',
+                name: TMPL + '/body.txt',
                 localeUser,
                 localeApp,
                 localePkg: DEF.LOCALE,
@@ -114,23 +97,22 @@ export default class Fl64_Auth_Otp_Back_Email_Register {
             const {content: meta} = await servRender.perform({
                 pkg: DEF.NAME,
                 type: TMPL_TYPE.EMAIL,
-                name: 'register.meta.json',
+                name: TMPL + '/meta.json',
                 localeUser,
                 localeApp,
                 localePkg: DEF.LOCALE,
                 view,
                 partials,
             });
-            const json = JSON.parse(meta);
-            const subject = json.subject; // see `register.meta.json` structure
+            const subject = JSON.parse(meta).subject;
             return {html, text, subject};
         }
 
         // MAIN
         /**
-         * Sends a verification email for a specific user.
-         * @param {TeqFw_Db_Back_RDb_ITrans} [trx] - Transaction context for database operations.
-         * @param {number} userId - Identifier of the user to process.
+         * Sends a one-time sign-in link to the specified user.
+         * @param {TeqFw_Db_Back_RDb_ITrans} [trx] - Optional database transaction context.
+         * @param {number} userId - Target user ID.
          * @param {string} [localeUser]
          * @param {string} [localeApp]
          * @returns {Promise<{resultCode: string}>}
@@ -145,7 +127,7 @@ export default class Fl64_Auth_Otp_Back_Email_Register {
                     const to = record.email;
                     const {success} = await actSend.act({to, subject, text, html});
                     resultCode = success ? RESULT_CODES.SUCCESS : RESULT_CODES.EMAIL_SEND_FAILED;
-                    logger.info(`Verification email sent successfully to user #${userId}`);
+                    logger.info(`Sign-in link sent to user #${userId}`);
                 } else {
                     resultCode = RESULT_CODES.USER_NOT_FOUND;
                     logger.info(`User not found: userId=${userId}`);
@@ -155,9 +137,21 @@ export default class Fl64_Auth_Otp_Back_Email_Register {
         };
 
         /**
-         * Returns the result codes for the operation.
-         * @return {typeof Fl64_Auth_Otp_Back_Email_Register.RESULT_CODES}
+         * Returns the set of result codes used by this service.
+         * @return {typeof Fl64_Auth_Otp_Back_Email_SignIn_Init.RESULT_CODES}
          */
         this.getResultCodes = () => RESULT_CODES;
     }
 }
+
+// VARS
+/**
+ * @memberOf Fl64_Auth_Otp_Back_Email_SignIn_Init
+ */
+const RESULT_CODES = {
+    EMAIL_SEND_FAILED: 'EMAIL_SEND_FAILED',
+    SUCCESS: 'SUCCESS',
+    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+    USER_NOT_FOUND: 'USER_NOT_FOUND',
+};
+Object.freeze(RESULT_CODES);

@@ -1,0 +1,10 @@
+Dear User,
+
+Your email address has been successfully verified.
+
+Your account is now active, and you can start using the service.
+
+If you did not perform this action or believe this was a mistake, please contact support.
+
+Best regards,
+Support Team

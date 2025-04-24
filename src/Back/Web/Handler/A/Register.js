@@ -15,7 +15,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
      * @param {Fl64_Auth_Otp_Back_Store_Mem_XsrfToken} memXsrfToken
      * @param {Fl64_Auth_Otp_Back_Web_Helper} helper
      * @param {Fl64_Auth_Otp_Back_Api_Adapter} adapter
-     * @param {Fl64_Auth_Otp_Back_Email_Register} servEmail
+     * @param {Fl64_Auth_Otp_Back_Email_SignUp_Verify} servEmail
      * @param {Fl64_Auth_Otp_Back_Store_RDb_Repo_Email} repoEmail
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Status} STATUS
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Register} RESULT
@@ -32,7 +32,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Register {
             Fl64_Auth_Otp_Back_Store_Mem_XsrfToken$: memXsrfToken,
             Fl64_Auth_Otp_Back_Web_Helper$: helper,
             Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
-            Fl64_Auth_Otp_Back_Email_Register$: servEmail,
+            Fl64_Auth_Otp_Back_Email_SignUp_Verify$: servEmail,
             Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
             Fl64_Auth_Otp_Shared_Enum_Status$: STATUS,
             Fl64_Auth_Otp_Shared_Enum_Web_Result_Register$: RESULT,

@@ -11,7 +11,7 @@ export default class Fl64_Auth_Otp_Back_Api_Adapter {
      * @param {object} params - Parameters object.
      * @param {TeqFw_Db_Back_RDb_ITrans} [params.trx] - Optional transaction context.
      * @param {number} params.userId - The unique identifier of the user for whom the email is being generated.
-     * @returns {Promise<{ok:boolean, uri403:string}>}
+     * @returns {Promise<{ok:boolean, uri401:string}>}
      */
     async canAuthenticateUser({trx, userId}) {
         throw new Error(`Interface '${this.constructor.name}' must be implemented.`);

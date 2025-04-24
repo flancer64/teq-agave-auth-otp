@@ -13,6 +13,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
      * @param {Fl64_Otp_Back_Mod_Token} modToken - OTP token model for handling OTP tokens
      * @param {Fl64_Web_Session_Back_Manager} session - Session manager to manage user sessions
      * @param {Fl64_Auth_Otp_Back_Store_RDb_Repo_Email} repoEmail - Repository for managing email-related data
+     * @param {Fl64_Auth_Otp_Back_Email_SignUp_Confirm} emailConfirm
      * @param {typeof Fl64_Auth_Otp_Back_Enum_Token_Type} OTP_TYPE - Enum for OTP token types
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Status} STATUS - Enum for email verification status
      * @param {typeof Fl64_Auth_Otp_Shared_Enum_Web_Result_Verify} RESULT - Enum for the result of the verification process
@@ -28,6 +29,7 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
             Fl64_Otp_Back_Mod_Token$: modToken,
             Fl64_Web_Session_Back_Manager$: session,
             Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
+            Fl64_Auth_Otp_Back_Email_SignUp_Confirm$: emailConfirm,
             Fl64_Auth_Otp_Back_Enum_Token_Type$: OTP_TYPE,
             Fl64_Auth_Otp_Shared_Enum_Status$: STATUS,
             Fl64_Auth_Otp_Shared_Enum_Web_Result_Verify$: RESULT,
@@ -96,6 +98,10 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Verify {
 
                                 // Delete the OTP token after it has been used
                                 await modToken.delete({trx, id: dto.id});
+                                // send the email in the separate transaction
+                                trxWrapper.execute(null, async (trx) => {
+                                    await emailConfirm.perform({trx, userId});
+                                }).catch(logger.exception);
                                 result = RESULT.SUCCESS;
                             } else {
                                 // Token does not correspond to a valid email or the email is already verified

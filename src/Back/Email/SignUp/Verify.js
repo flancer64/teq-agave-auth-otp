@@ -1,25 +1,9 @@
 /**
- * Operation to send a verification email for user login.
- */
-// VARS
-/**
- * @memberOf Fl64_Auth_Otp_Back_Email_Login
- */
-const RESULT_CODES = {
-    EMAIL_SEND_FAILED: 'EMAIL_SEND_FAILED',
-    SUCCESS: 'SUCCESS',
-    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-    USER_NOT_FOUND: 'USER_NOT_FOUND',
-};
-Object.freeze(RESULT_CODES);
-
-const OTP_LIFETIME = 24 * 3600; // 24 hours in seconds
-
-// MAIN
-/**
+ * Operation to send a verification email for user email address verification.
+ *
  * @implements TeqFw_Core_Shared_Api_Service
  */
-export default class Fl64_Auth_Otp_Back_Email_Login {
+export default class Fl64_Auth_Otp_Back_Email_SignUp_Verify {
     /**
      * @param {Fl64_Auth_Otp_Back_Defaults} DEF
      * @param {TeqFw_Core_Back_Config} config
@@ -33,21 +17,25 @@ export default class Fl64_Auth_Otp_Back_Email_Login {
      * @param {typeof Fl64_Tmpl_Back_Enum_Type} TMPL_TYPE
      * @param {typeof Fl64_Auth_Otp_Back_Enum_Token_Type} TOKEN
      */
-    constructor({
-                    Fl64_Auth_Otp_Back_Defaults$: DEF,
-                    TeqFw_Core_Back_Config$: config,
-                    TeqFw_Core_Shared_Api_Logger$$: logger,
-                    TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
-                    Fl64_Tmpl_Back_Service_Render$: servRender,
-                    TeqFw_Email_Back_Act_Send$: actSend,
-                    Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
-                    Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
-                    Fl64_Otp_Back_Mod_Token$: modToken,
-                    Fl64_Tmpl_Back_Enum_Type$: TMPL_TYPE,
-                    Fl64_Auth_Otp_Back_Enum_Token_Type$: TOKEN,
-                }) {
+    constructor(
+        {
+            Fl64_Auth_Otp_Back_Defaults$: DEF,
+            TeqFw_Core_Back_Config$: config,
+            TeqFw_Core_Shared_Api_Logger$$: logger,
+            TeqFw_Db_Back_App_TrxWrapper$: trxWrapper,
+            Fl64_Tmpl_Back_Service_Render$: servRender,
+            TeqFw_Email_Back_Act_Send$: actSend,
+            Fl64_Auth_Otp_Back_Api_Adapter$: adapter,
+            Fl64_Auth_Otp_Back_Store_RDb_Repo_Email$: repoEmail,
+            Fl64_Otp_Back_Mod_Token$: modToken,
+            Fl64_Tmpl_Back_Enum_Type$: TMPL_TYPE,
+            Fl64_Auth_Otp_Back_Enum_Token_Type$: TOKEN,
+        }
+    ) {
         // VARS
         const A_EMAIL = repoEmail.getSchema().getAttributes();
+        const OTP_LIFETIME = 24 * 3600; // 24 hours in seconds
+        const TMPL = 'signup/verify';
         let URL_BASE;
 
         // FUNCS
@@ -64,7 +52,7 @@ export default class Fl64_Auth_Otp_Back_Email_Login {
                 const base = web.urlBase;
                 const space = DEF.SHARED.SPACE;
                 const param = DEF.SHARED.PARAM_TOKEN;
-                URL_BASE = `https://${base}/${space}/${DEF.SHARED.ROUTE_AUTH}?${param}=`;
+                URL_BASE = `https://${base}/${space}/${DEF.SHARED.ROUTE_VERIFY}?${param}=`;
             }
             return URL_BASE + token;
         }
@@ -77,19 +65,22 @@ export default class Fl64_Auth_Otp_Back_Email_Login {
          * @returns {Promise<{html:string, text:string, subject:string}>}
          */
         async function prepareContent(trx, email, localeUser, localeApp) {
-            // create OTP-token to compose verification link
+            // create OTP-token to compose a verification link
             const {token} = await modToken.create({
-                trx, userId: email.user_ref, type: TOKEN.AUTHENTICATION, lifetime: OTP_LIFETIME
+                trx,
+                userId: email.user_ref,
+                type: TOKEN.EMAIL_VERIFICATION,
+                lifetime: OTP_LIFETIME
             });
             const verifyLink = composeVerifyUrl(token);
             // load application level vars and partials for template processing
-            const {vars: appVars, partials} = await adapter.getTmplDataEmailAuthenticate({trx, userId: email.user_ref});
+            const {vars: appVars, partials} = await adapter.getTmplDataEmailRegister({trx, userId: email.user_ref});
             const view = {verifyLink, ...appVars};
             // render HTML & text templates
             const {content: html} = await servRender.perform({
                 pkg: DEF.NAME,
                 type: TMPL_TYPE.EMAIL,
-                name: 'authenticate.html',
+                name: TMPL + '/body.html',
                 localeUser,
                 localeApp,
                 localePkg: DEF.LOCALE,
@@ -99,7 +90,7 @@ export default class Fl64_Auth_Otp_Back_Email_Login {
             const {content: text} = await servRender.perform({
                 pkg: DEF.NAME,
                 type: TMPL_TYPE.EMAIL,
-                name: 'authenticate.txt',
+                name: TMPL + '/body.txt',
                 localeUser,
                 localeApp,
                 localePkg: DEF.LOCALE,
@@ -109,7 +100,7 @@ export default class Fl64_Auth_Otp_Back_Email_Login {
             const {content: meta} = await servRender.perform({
                 pkg: DEF.NAME,
                 type: TMPL_TYPE.EMAIL,
-                name: 'authenticate.meta.json',
+                name: TMPL + '/meta.json',
                 localeUser,
                 localeApp,
                 localePkg: DEF.LOCALE,
@@ -117,7 +108,7 @@ export default class Fl64_Auth_Otp_Back_Email_Login {
                 partials,
             });
             const json = JSON.parse(meta);
-            const subject = json.subject; // see `authenticate.meta.json` structure
+            const subject = json.subject; // see `meta.json` structure
             return {html, text, subject};
         }
 
@@ -151,8 +142,20 @@ export default class Fl64_Auth_Otp_Back_Email_Login {
 
         /**
          * Returns the result codes for the operation.
-         * @return {typeof Fl64_Auth_Otp_Back_Email_Login.RESULT_CODES}
+         * @return {typeof Fl64_Auth_Otp_Back_Email_SignUp_Verify.RESULT_CODES}
          */
         this.getResultCodes = () => RESULT_CODES;
     }
 }
+
+// VARS
+/**
+ * @memberOf Fl64_Auth_Otp_Back_Email_SignUp_Verify
+ */
+const RESULT_CODES = {
+    EMAIL_SEND_FAILED: 'EMAIL_SEND_FAILED',
+    SUCCESS: 'SUCCESS',
+    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+    USER_NOT_FOUND: 'USER_NOT_FOUND',
+};
+Object.freeze(RESULT_CODES);
