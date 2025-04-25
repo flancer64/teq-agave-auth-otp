@@ -122,10 +122,10 @@ export default class Fl64_Auth_Otp_Back_Web_Handler_A_Login {
                                         });
                                 } else {
                                     if (uri401) {
-                                        respond.code303_SeeOther({
+                                        respond.code200_Ok({
                                             res,
                                             headers: {[HTTP2_HEADER_LOCATION]: uri401},
-                                            body: JSON.stringify({result: RESULT.ERR_401}),
+                                            body: JSON.stringify({result: RESULT.ERR_401, redirectUri: uri401}),
                                         });
                                     } else {
                                         respond.code401_Unauthorized({
