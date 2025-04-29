@@ -50,7 +50,6 @@ export default class Fl64_Auth_Otp_Front_Ui_Page_Register {
         const emailInput = document.getElementById('email');
         const xsrfTokenInput = document.getElementById('xsrf_token');
         const successMsg = document.getElementById('success-msg');
-        debugger
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             clearMessages();
